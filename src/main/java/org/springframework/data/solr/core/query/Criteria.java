@@ -336,12 +336,14 @@ public class Criteria implements QueryStringHolder {
 	 * @param upperBound
 	 * @return
 	 */
-	public Criteria between(Object lowerBound, Object upperBound) {
+	public Criteria between(Object lowerBound, Object upperBound, boolean minInclusive, boolean maxInclusive) {
 		if (lowerBound == null && upperBound == null) {
-			throw new InvalidDataAccessApiUsageException("Range [* TO *] is not allowed");
+			throw new InvalidDataAccessApiUsageException(
+					"Range [* TO *] is not allowed");
 		}
 
-		criteria.add(new CriteriaEntry(OperationKey.BETWEEN, new Object[] { lowerBound, upperBound }));
+		criteria.add(new CriteriaEntry(OperationKey.BETWEEN, new Object[] {
+				lowerBound, upperBound, minInclusive, maxInclusive }));
 		return this;
 	}
 
@@ -351,8 +353,8 @@ public class Criteria implements QueryStringHolder {
 	 * @param upperBound
 	 * @return
 	 */
-	public Criteria lessThanEqual(Object upperBound) {
-		between(null, upperBound);
+	public Criteria lessThanEqual(Object upperBound, boolean inclusive) {
+		between(null, upperBound, true, inclusive);
 		return this;
 	}
 
@@ -362,8 +364,8 @@ public class Criteria implements QueryStringHolder {
 	 * @param lowerBound
 	 * @return
 	 */
-	public Criteria greaterThanEqual(Object lowerBound) {
-		between(lowerBound, null);
+	public Criteria greaterThanEqual(Object lowerBound, boolean inclusive) {
+		between(lowerBound, null, inclusive, true);
 		return this;
 	}
 
@@ -501,10 +503,17 @@ public class Criteria implements QueryStringHolder {
 		if (StringUtils.equals(OperationKey.BETWEEN.getKey(), key)) {
 			Object[] args = (Object[]) value;
 			String rangeFragment = "[";
+			if((Boolean)args[2]==false){
+				rangeFragment = "(";
+			}
 			rangeFragment += args[0] != null ? filterCriteriaValue(args[0]) : WILDCARD;
 			rangeFragment += RANGE_OPERATOR;
 			rangeFragment += args[1] != null ? filterCriteriaValue(args[1]) : WILDCARD;
-			rangeFragment += "]";
+			if((Boolean)args[3]==true){
+				rangeFragment += "]";
+			} else {
+				rangeFragment += ")";
+			}
 			return rangeFragment;
 		}
 
