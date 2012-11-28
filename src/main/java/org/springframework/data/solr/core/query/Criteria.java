@@ -504,7 +504,7 @@ public class Criteria implements QueryStringHolder {
 			Object[] args = (Object[]) value;
 			String rangeFragment = "[";
 			if((Boolean)args[2]==false){
-				rangeFragment = "(";
+				rangeFragment = "{";
 			}
 			rangeFragment += args[0] != null ? filterCriteriaValue(args[0]) : WILDCARD;
 			rangeFragment += RANGE_OPERATOR;
@@ -512,7 +512,7 @@ public class Criteria implements QueryStringHolder {
 			if((Boolean)args[3]==true){
 				rangeFragment += "]";
 			} else {
-				rangeFragment += ")";
+				rangeFragment += "}";
 			}
 			return rangeFragment;
 		}
